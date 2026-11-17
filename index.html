@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תרגול למבחן באנגלית - Jet 1 יחידה 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Rubik', sans-serif; background: #f0f7ff; }
+    .ltr { direction: ltr; unicode-bidi: isolate; }
+    .pop { animation: pop 0.28s ease-out; }
+    @keyframes pop { 0% { transform: scale(0.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    .shake { animation: shake 0.35s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 pb-12">
+
+  <!-- Welcome / Audio Unlock Overlay -->
+  <div id="welcomeOverlay" class="fixed inset-0 z-50 bg-indigo-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-7 text-center shadow-2xl border-4 border-indigo-200 pop">
+      <div class="text-6xl mb-3">🚀🎧</div>
+      <h1 class="text-2xl font-black text-indigo-900 mb-2">מוכנים למבחן באנגלית?</h1>
+      <p class="text-slate-600 mb-5 text-base leading-relaxed">
+        תרגול אינטראקטיבי עם תמונות וקול עבור <strong>Jet 1 – יחידה ראשונה</strong> (כיתה ג').
+      </p>
+      <button onclick="startApp()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-black text-xl py-4 px-6 rounded-2xl shadow-lg transition flex items-center justify-center gap-3 cursor-pointer">
+        <span>🔊</span>
+        <span>התחל תרגול והפעל קול</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">📘</span>
+        <div>
+          <h1 class="font-black text-lg leading-tight">Jet 1 – יחידה 1</h1>
+          <p class="text-xs text-indigo-200">תרגול לקראת המבחן</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="testAudio()" class="bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold py-2 px-3 rounded-xl border border-indigo-300/40 flex items-center gap-1 cursor-pointer">
+          <span>🔊</span>
+          <span>בדיקת שמע</span>
+        </button>
+        <div class="bg-amber-400 text-amber-950 font-black px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-inner">
+          <span>⭐</span>
+          <span id="starCount">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pt-5">
+    <!-- Navigation Tabs -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6" id="navTabs">
+      <button onclick="setMode('letters')" data-mode="letters" class="tab-btn bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>🔤</span><span>אותיות וצלילים</span>
+      </button>
+      <button onclick="setMode('firstLast')" data-mode="firstLast" class="tab-btn bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>✏️</span><span>אות ראשונה/אחרונה</span>
+      </button>
+      <button onclick="setMode('listening')" data-mode="listening" class="tab-btn bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>👂</span><span>אוצר מילים משמיעה</span>
+      </button>
+      <button onclick="setMode('global')" data-mode="global" class="tab-btn bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>👁️</span><span>מילים גלובליות</span>
+      </button>
+      <button onclick="setMode('colorsNumbers')" data-mode="colorsNumbers" class="tab-btn bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>🎨</span><span>צבעים ומספרים 0-12</span>
+      </button>
+      <button onclick="setMode('dictionary')" data-mode="dictionary" class="tab-btn bg-amber-50 border-2 border-amber-300 hover:border-amber-500 text-amber-900 rounded-2xl p-3 font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition">
+        <span>📖</span><span>מילון שמע מהיר</span>
+      </button>
+    </div>
+
+    <!-- Main Interactive Stage -->
+    <div id="stage" class="bg-white rounded-3xl shadow-xl border-2 border-slate-100 p-5 sm:p-7 min-h-[380px]"></div>
+  </main>
+
+  <script>
+    // --- Data ---
+    const LETTERS = [
+      { upper: 'A', lower: 'a', speak: 'A', heb: 'אֵיי (צליל אַ)', word: 'apple', emoji: '🍎' },
+      { upper: 'B', lower: 'b', speak: 'B', heb: 'בִּי (צליל בְּ)', word: 'book', emoji: '📘' },
+      { upper: 'N', lower: 'n', speak: 'N', heb: 'אֶן (צליל נְ)', word: 'nose', emoji: '👃' },
+      { upper: 'D', lower: 'd', speak: 'D', heb: 'דִּי (צליל דְּ)', word: 'dog', emoji: '🐶' },
+      { upper: 'G', lower: 'g', speak: 'G', heb: 'גִּ׳י (צליל גְּ)', word: 'gorilla', emoji: '🦍' }
+    ];
+
+    const FIRST_LAST_WORDS = [
+      { word: 'girl', heb: 'ילדה', emoji: '👧', first: 'g', last: 'l', speak: 'girl', phon: 'גֶּרְל' },
+      { word: 'gift', heb: 'מתנה', emoji: '🎁', first: 'g', last: 't', speak: 'gift', phon: 'גִּיפְט' },
+      { word: 'avocado', heb: 'אבוקדו', emoji: '🥑', first: 'a', last: 'o', speak: 'avocado', phon: 'אַבוֹקָדוֹ' },
+      { word: 'baby', heb: 'תינוק', emoji: '👶', first: 'b', last: 'y', speak: 'baby', phon: 'בֵּייבִּי' },
+      { word: 'notebook', heb: 'מחברת', emoji: '📓', first: 'n', last: 'k', speak: 'notebook', phon: 'נוֹטְבּוּק' },
+      { word: 'desk', heb: 'שולחן כתיבה', emoji: '🏫', first: 'd', last: 'k', speak: 'desk', phon: 'דֶסְק' },
+      { word: 'bag', heb: 'תיק', emoji: '🎒', first: 'b', last: 'g', speak: 'bag', phon: 'בֶּג' },
+      { word: 'nine', heb: 'תשע (9)', emoji: '9️⃣', first: 'n', last: 'e', speak: 'nine', phon: 'נַיְין' },
+      { word: 'seven', heb: 'שבע (7)', emoji: '7️⃣', first: 's', last: 'n', speak: 'seven', phon: 'סֶבֶן' },
+      { word: 'red', heb: 'אדום', emoji: '🔴', first: 'r', last: 'd', speak: 'red', phon: 'רֶד' },
+      { word: 'man', heb: 'איש / גבר', emoji: '👨', first: 'm', last: 'n', speak: 'man', phon: 'מֶן' },
+      { word: 'black', heb: 'שחור', emoji: '⬛', first: 'b', last: 'k', speak: 'black', phon: 'בְּלֶק' }
+    ];
+
+    const LISTENING_WORDS = [
+      { word: 'apple', heb: 'תפוח', emoji: '🍎', phon: 'אַפְּל' },
+      { word: 'dog', heb: 'כלב', emoji: '🐶', phon: 'דּוֹג' },
+      { word: 'book', heb: 'ספר', emoji: '📘', phon: 'בּוּק' },
+      { word: 'bag', heb: 'תיק', emoji: '🎒', phon: 'בֶּג' },
+      { word: 'astronaut', heb: 'אסטרונאוט', emoji: '🧑‍🚀', phon: 'אַסְטְרוֹנָאוּט' },
+      { word: 'big', heb: 'גדול', emoji: '🐘', phon: 'בִּיג' },
+      { word: 'noodles', heb: 'אטריות', emoji: '🍜', phon: 'נוּדְלְס' },
+      { word: 'ambulance', heb: 'אמבולנס', emoji: '🚑', phon: 'אַמְבּוּלַנְס' },
+      { word: 'gorilla', heb: 'גורילה', emoji: '🦍', phon: 'גוֹרִילָה' },
+      { word: 'dad', heb: 'אבא', emoji: '👨', phon: 'דֶּד' },
+      { word: 'nose', heb: 'אף', emoji: '👃', phon: 'נוֹז' },
+      { word: 'grandma', heb: 'סבתא', emoji: '👵', phon: 'גְרֶנְדְמָה' }
+    ];
+
+    const GLOBAL_WORDS = [
+      { word: 'Look', heb: 'תראה / תסתכל', emoji: '👀', distractors: ['book', 'lock', 'look'], phon: 'לוּק' },
+      { word: 'I am', heb: 'אני (הנני)', emoji: '🙋‍♂️', distractors: ['I in', 'am I', 'I an'], phon: 'אַיי אֶם' },
+      { word: 'banana', heb: 'בננה', emoji: '🍌', distractors: ['band', 'apple', 'baanana'], phon: 'בַּנָנָה' }
+    ];
+
+    const COLORS_NUMBERS = [
+      { label: 'red', heb: 'אדום', color: '#ef4444', emoji: '🔴', phon: 'רֶד' },
+      { label: 'blue', heb: 'כחול', color: '#3b82f6', emoji: '🔵', phon: 'בְּלוּ' },
+      { label: 'green', heb: 'ירוק', color: '#22c55e', emoji: '🟢', phon: 'גְרִין' },
+      { label: 'yellow', heb: 'צהוב', color: '#eab308', emoji: '🟡', phon: 'יֶלוֹ' },
+      { label: 'black', heb: 'שחור', color: '#1e293b', emoji: '⚫', phon: 'בְּלֶק' },
+      { label: 'orange', heb: 'כתום', color: '#f97316', emoji: '🟠', phon: 'אוֹרֶנְג׳' },
+      { label: 'pink', heb: 'ורוד', color: '#ec4899', emoji: '🩷', phon: 'פִּינְק' },
+      { label: 'purple', heb: 'סגול', color: '#a855f7', emoji: '🟣', phon: 'פֶּרְפְּל' },
+      { label: 'brown', heb: 'חום', color: '#92400e', emoji: '🟤', phon: 'בְּרַאוּן' },
+      { label: 'zero', heb: '0 (אפס)', emoji: '0️⃣', phon: 'זִירוֹ' },
+      { label: 'one', heb: '1 (אחת)', emoji: '1️⃣', phon: 'וואן' },
+      { label: 'two', heb: '2 (שתיים)', emoji: '2️⃣', phon: 'טוּ' },
+      { label: 'three', heb: '3 (שלוש)', emoji: '3️⃣', phon: 'תְ׳רִי' },
+      { label: 'four', heb: '4 (ארבע)', emoji: '4️⃣', phon: 'פוֹר' },
+      { label: 'five', heb: '5 (חמש)', emoji: '5️⃣', phon: 'פַיְיב' },
+      { label: 'six', heb: '6 (שש)', emoji: '6️⃣', phon: 'סִיקְס' },
+      { label: 'seven', heb: '7 (שבע)', emoji: '7️⃣', phon: 'סֶבֶן' },
+      { label: 'eight', heb: '8 (שמונה)', emoji: '8️⃣', phon: 'אֵייט' },
+      { label: 'nine', heb: '9 (תשע)', emoji: '9️⃣', phon: 'נַיְין' },
+      { label: 'ten', heb: '10 (עשר)', emoji: '🔟', phon: 'טֶן' },
+      { label: 'eleven', heb: '11 (אחת עשרה)', emoji: '1️⃣1️⃣', phon: 'אִילֶבֶן' },
+      { label: 'twelve', heb: '12 (שתים עשרה)', emoji: '1️⃣2️⃣', phon: 'טְוֶולְב' }
+    ];
+
+    // --- State & Audio Engine ---
+    let stars = 0;
+    let currentMode = 'letters';
+    let currentQuestion = null;
+    let audioCtx = null;
+
+    function unlockAudio() {
+      try {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) audioCtx = new AudioContext();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (e) {}
+    }
+
+    function playTone(freq, duration = 0.15, type = 'sine', delay = 0) {
+      try {
+        unlockAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + duration);
+      } catch (e) {}
+    }
+
+    function playSuccessSound() {
+      playTone(523.25, 0.12, 'triangle', 0);
+      playTone(659.25, 0.12, 'triangle', 0.1);
+      playTone(783.99, 0.22, 'triangle', 0.2);
+    }
+
+    function playErrorSound() {
+      playTone(220, 0.2, 'sawtooth', 0);
+    }
+
+    function speakText(text, phoneticHint = '') {
+      unlockAudio();
+      const hintEl = document.getElementById('phoneticDisplay');
+      if (hintEl && phoneticHint) {
+        hintEl.textContent = `הגייה: ${phoneticHint}`;
+        hintEl.classList.remove('hidden');
+      }
+
+      let spokeViaWebSpeech = false;
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'en-US';
+          utter.rate = 0.85;
+          const voices = window.speechSynthesis.getVoices();
+          const enVoice = voices.find(v => v.lang.startsWith('en-US')) || voices.find(v => v.lang.startsWith('en'));
+          if (enVoice) utter.voice = enVoice;
+          utter.onstart = () => { spokeViaWebSpeech = true; };
+          window.speechSynthesis.speak(utter);
+        } catch (e) {}
+      }
+
+      // Fallback online dictionary audio if Web Speech is blocked/silent
+      setTimeout(() => {
+        if (!spokeViaWebSpeech) {
+          const cleanWord = encodeURIComponent(text.trim().toLowerCase());
+          const audio = new Audio(`https://dict.youdao.com/dictvoice?audio=${cleanWord}&type=2`);
+          audio.play().catch(() => {});
+        }
+      }, 450);
+    }
+
+    function startApp() {
+      unlockAudio();
+      document.getElementById('welcomeOverlay').classList.add('hidden');
+      playSuccessSound();
+      setMode('letters');
+    }
+
+    function testAudio() {
+      speakText('Hello! Good luck!', 'הֶלוֹ! גוּד לַאק!');
+    }
+
+    function addStar() {
+      stars++;
+      const el = document.getElementById('starCount');
+      el.textContent = stars;
+      el.parentElement.classList.remove('pop');
+      void el.parentElement.offsetWidth;
+      el.parentElement.classList.add('pop');
+    }
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.mode === mode) {
+          btn.classList.add('ring-4', 'ring-indigo-300', 'bg-indigo-50', 'border-indigo-600');
+        } else {
+          btn.classList.remove('ring-4', 'ring-indigo-300', 'bg-indigo-50', 'border-indigo-600');
+        }
+      });
+      renderMode();
+    }
+
+    function renderMode() {
+      const stage = document.getElementById('stage');
+      if (currentMode === 'letters') renderLettersQuiz(stage);
+      else if (currentMode === 'firstLast') renderFirstLastQuiz(stage);
+      else if (currentMode === 'listening') renderListeningQuiz(stage);
+      else if (currentMode === 'global') renderGlobalQuiz(stage);
+      else if (currentMode === 'colorsNumbers') renderColorsNumbersQuiz(stage);
+      else if (currentMode === 'dictionary') renderDictionary(stage);
+    }
+
+    // --- 1. Letters Mode ---
+    function renderLettersQuiz(stage) {
+      const target = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+      const askUpper = Math.random() > 0.5;
+      const options = shuffle(LETTERS).slice(0, 4);
+      if (!options.find(o => o.upper === target.upper)) options[0] = target;
+      const finalOptions = shuffle(options);
+
+      stage.innerHTML = `
+        <div class="text-center">
+          <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full mb-3">אותיות היחידה: Aa, Bb, Nn, Dd, Gg</span>
+          <h2 class="text-xl font-black text-slate-800 mb-4">לחצו על הרמקול וזהו את האות ${askUpper ? 'הגדולה' : 'הקטנה'}:</h2>
+          
+          <button onclick="speakText('${target.speak}', '${target.heb}')" class="mx-auto mb-3 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-3xl px-8 py-5 shadow-lg flex items-center gap-3 text-2xl font-black cursor-pointer transition">
+            <span>🔊</span>
+            <span>השמע אות</span>
+          </button>
+          <div id="phoneticDisplay" class="hidden text-sm font-bold text-indigo-600 mb-4"></div>
+
+          <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mt-6">
+            ${finalOptions.map(opt => {
+              const display = askUpper ? opt.upper : opt.lower;
+              const isCorrect = opt.upper === target.upper;
+              return `<button onclick="checkAnswer(this, ${isCorrect}, () => renderLettersQuiz(document.getElementById('stage')))" class="ltr bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-2xl py-6 text-5xl font-black text-indigo-950 shadow-sm cursor-pointer transition">${display}</button>`;
+            }).join('')}
+          </div>
+
+          <div class="mt-8 pt-5 border-t border-slate-100">
+            <p class="text-xs font-bold text-slate-400 mb-2">חימום מהיר – לחצו על אות כדי לשמוע אותה:</p>
+            <div class="flex justify-center gap-2 flex-wrap ltr">
+              ${LETTERS.map(l => `
+                <button onclick="speakText('${l.speak}', '${l.heb}')" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl px-4 py-2 font-black text-lg text-amber-900 cursor-pointer">
+                  ${l.upper}${l.lower}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      setTimeout(() => speakText(target.speak, target.heb), 250);
+    }
+
+    // --- 2. First & Last Letter Mode ---
+    function renderFirstLastQuiz(stage) {
+      const item = FIRST_LAST_WORDS[Math.floor(Math.random() * FIRST_LAST_WORDS.length)];
+      const askFirst = Math.random() > 0.5;
+      const correctLetter = askFirst ? item.first : item.last;
+      const maskedWord = askFirst
+        ? `<span class="text-rose-500 underline">_</span>${item.word.slice(1)}`
+        : `${item.word.slice(0, -1)}<span class="text-rose-500 underline">_</span>`;
+
+      const pool = ['a', 'b', 'n', 'd', 'g', 'l', 't', 'o', 'y', 'k', 'e', 's', 'r', 'm'];
+      let opts = [correctLetter];
+      while (opts.length < 4) {
+        const rand = pool[Math.floor(Math.random() * pool.length)];
+        if (!opts.includes(rand)) opts.push(rand);
+      }
+      opts = shuffle(opts);
+
+      stage.innerHTML = `
+        <div class="text-center">
+          <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-3">זיהוי אות ראשונה ואות אחרונה</span>
+          <h2 class="text-xl font-black text-slate-800 mb-2">מהי האות <strong>${askFirst ? 'הראשונה' : 'האחרונה'}</strong> של המילה?</h2>
+          
+          <div class="my-4 flex flex-col items-center">
+            <div class="text-7xl mb-2">${item.emoji}</div>
+            <div class="text-lg font-bold text-slate-600 mb-2">${item.heb}</div>
+            <button onclick="speakText('${item.speak}', '${item.phon}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow cursor-pointer mb-3">
+              <span>🔊</span><span>השמע מילה</span>
+            </button>
+            <div id="phoneticDisplay" class="hidden text-xs font-bold text-emerald-700 mb-2"></div>
+            <div class="ltr text-4xl font-black tracking-widest bg-slate-100 px-6 py-3 rounded-2xl border-2 border-slate-200">${maskedWord}</div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-md mx-auto mt-5 ltr">
+            ${opts.map(letter => `
+              <button onclick="checkAnswer(this, ${letter === correctLetter}, () => renderFirstLastQuiz(document.getElementById('stage')))" class="bg-white hover:bg-emerald-50 border-2 border-slate-200 rounded-2xl py-4 text-3xl font-black text-slate-800 shadow-sm cursor-pointer transition">
+                ${letter}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      setTimeout(() => speakText(item.speak, item.phon), 250);
+    }
+
+    // --- 3. Listening Vocabulary Mode ---
+    function renderListeningQuiz(stage) {
+      const target = LISTENING_WORDS[Math.floor(Math.random() * LISTENING_WORDS.length)];
+      let opts = [target];
+      while (opts.length < 4) {
+        const cand = LISTENING_WORDS[Math.floor(Math.random() * LISTENING_WORDS.length)];
+        if (!opts.find(o => o.word === cand.word)) opts.push(cand);
+      }
+      opts = shuffle(opts);
+
+      stage.innerHTML = `
+        <div class="text-center">
+          <span class="inline-block bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full mb-3">אוצר מילים להבנה משמיעה</span>
+          <h2 class="text-xl font-black text-slate-800 mb-4">הקשיבו למילה ובחרו את התמונה והפירוש הנכון:</h2>
+          
+          <button onclick="speakText('${target.word}', '${target.phon}')" class="mx-auto mb-3 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white rounded-3xl px-8 py-5 shadow-lg flex items-center gap-3 text-2xl font-black cursor-pointer transition">
+            <span>🔊</span>
+            <span>השמע מילה</span>
+          </button>
+          <div id="phoneticDisplay" class="hidden text-sm font-bold text-purple-700 mb-3"></div>
+
+          <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto mt-5">
+            ${opts.map(opt => `
+              <button onclick="checkAnswer(this, ${opt.word === target.word}, () => renderListeningQuiz(document.getElementById('stage')))" class="bg-slate-50 hover:bg-purple-50 border-2 border-slate-200 rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm cursor-pointer transition">
+                <span class="text-5xl">${opt.emoji}</span>
+                <span class="font-bold text-lg text-slate-800">${opt.heb}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      setTimeout(() => speakText(target.word, target.phon), 250);
+    }
+
+    // --- 4. Global Words Mode ---
+    function renderGlobalQuiz(stage) {
+      const target = GLOBAL_WORDS[Math.floor(Math.random() * GLOBAL_WORDS.length)];
+      const opts = shuffle([target.word, ...target.distractors]);
+
+      stage.innerHTML = `
+        <div class="text-center">
+          <span class="inline-block bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mb-3">מילים גלובליות: Look, I am, banana</span>
+          <h2 class="text-xl font-black text-slate-800 mb-3">מצאו את המילה באנגלית שמתאימה לפירוש:</h2>
+          
+          <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 max-w-sm mx-auto mb-4">
+            <div class="text-5xl mb-2">${target.emoji}</div>
+            <div class="text-2xl font-black text-amber-950 mb-2">${target.heb}</div>
+            <button onclick="speakText('${target.word}', '${target.phon}')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-full text-sm font-bold inline-flex items-center gap-1 cursor-pointer">
+              <span>🔊</span><span>רמז קולי</span>
+            </button>
+            <div id="phoneticDisplay" class="hidden text-xs font-bold text-amber-800 mt-2"></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 max-w-md mx-auto ltr">
+            ${opts.map(w => `
+              <button onclick="checkAnswer(this, '${w}' === '${target.word}', () => renderGlobalQuiz(document.getElementById('stage')))" class="bg-white hover:bg-amber-50 border-2 border-slate-200 rounded-2xl py-4 text-2xl font-black text-slate-800 shadow-sm cursor-pointer transition">
+                ${w}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 5. Colors & Numbers 0-12 Mode ---
+    function renderColorsNumbersQuiz(stage) {
+      const target = COLORS_NUMBERS[Math.floor(Math.random() * COLORS_NUMBERS.length)];
+      let opts = [target];
+      while (opts.length < 4) {
+        const cand = COLORS_NUMBERS[Math.floor(Math.random() * COLORS_NUMBERS.length)];
+        if (!opts.find(o => o.label === cand.label)) opts.push(cand);
+      }
+      opts = shuffle(opts);
+
+      stage.innerHTML = `
+        <div class="text-center">
+          <span class="inline-block bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full mb-3">צבעים ומספרים 0–12</span>
+          <h2 class="text-xl font-black text-slate-800 mb-4">הקשיבו ובחרו את הצבע או המספר הנכון:</h2>
+          
+          <button onclick="speakText('${target.label}', '${target.phon}')" class="mx-auto mb-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-3xl px-8 py-5 shadow-lg flex items-center gap-3 text-2xl font-black cursor-pointer transition">
+            <span>🔊</span>
+            <span>השמע</span>
+          </button>
+          <div id="phoneticDisplay" class="hidden text-sm font-bold text-rose-700 mb-3"></div>
+
+          <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto mt-5">
+            ${opts.map(opt => `
+              <button onclick="checkAnswer(this, '${opt.label}' === '${target.label}', () => renderColorsNumbersQuiz(document.getElementById('stage')))" class="bg-slate-50 hover:bg-rose-50 border-2 border-slate-200 rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm cursor-pointer transition">
+                ${opt.color
+                  ? `<div class="w-12 h-12 rounded-full border-2 border-slate-300 shadow-inner" style="background:${opt.color}"></div>`
+                  : `<span class="text-4xl">${opt.emoji}</span>`}
+                <span class="font-bold text-lg text-slate-800">${opt.heb}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      setTimeout(() => speakText(target.label, target.phon), 250);
+    }
+
+    // --- 6. Audio Dictionary Mode ---
+    function renderDictionary(stage) {
+      stage.innerHTML = `
+        <div>
+          <h2 class="text-xl font-black text-slate-800 mb-1 text-center">📖 מילון שמע מהיר לחזרה</h2>
+          <p class="text-sm text-slate-500 text-center mb-5">לחצו על כל כרטיסייה כדי לשמוע את ההגייה באנגלית</p>
+
+          <h3 class="font-black text-indigo-800 mb-2">🔤 אותיות היחידה</h3>
+          <div class="grid grid-cols-5 gap-2 mb-5 ltr">
+            ${LETTERS.map(l => `
+              <button onclick="speakText('${l.speak}', '${l.heb}')" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl p-3 text-center cursor-pointer">
+                <div class="text-2xl font-black text-indigo-950">${l.upper}${l.lower}</div>
+                <div class="text-xs text-indigo-600 mt-1">🔊</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <h3 class="font-black text-amber-800 mb-2">👁️ מילים גלובליות</h3>
+          <div class="grid grid-cols-3 gap-2 mb-5">
+            ${GLOBAL_WORDS.map(g => `
+              <button onclick="speakText('${g.word}', '${g.phon}')" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl p-3 text-center cursor-pointer">
+                <div class="text-2xl mb-1">${g.emoji}</div>
+                <div class="ltr font-black text-slate-900">${g.word}</div>
+                <div class="text-xs text-slate-600">${g.heb}</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <h3 class="font-black text-purple-800 mb-2">👂 מילות שמיעה ואוצר מילים</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            ${[...LISTENING_WORDS, ...FIRST_LAST_WORDS.filter(f => !LISTENING_WORDS.find(l => l.word === f.word))].map(w => `
+              <button onclick="speakText('${w.word}', '${w.phon}')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between cursor-pointer text-right">
+                <div>
+                  <div class="ltr font-black text-slate-900 text-base">${w.word}</div>
+                  <div class="text-xs text-slate-600">${w.heb}</div>
+                </div>
+                <span class="text-2xl">${w.emoji}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // --- Answer Validation ---
+    function checkAnswer(btn, isCorrect, nextFn) {
+      if (isCorrect) {
+        btn.classList.remove('bg-slate-50', 'bg-white', 'border-slate-200');
+        btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600', 'pop');
+        playSuccessSound();
+        addStar();
+        setTimeout(nextFn, 850);
+      } else {
+        btn.classList.add('bg-rose-100', 'border-rose-400', 'shake');
+        playErrorSound();
+        setTimeout(() => btn.classList.remove('shake'), 400);
+      }
+    }
+  </script>
+</body>
+</html>
